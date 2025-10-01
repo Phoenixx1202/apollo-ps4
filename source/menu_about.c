@@ -17,17 +17,18 @@ static char user_id_str[9] = "00000000";
 static char psid_str[] = "0000000000000000 0000000000000000";
 static char account_id_str[] = "0000000000000000";
 
-const char * menu_about_strings[] = { "Bucanero", "Developer",
+const char * menu_about_strings[] = { "Bucanero", "Desenvolvedor",
 									"", "",
-									"PS3", "credits",
+									"PS3", "créditos",
 									"Berion", "GUI design",
-									"Dnawrkshp", "Artemis code",
+									"Dnawrkshp", "Código Artemis",
 									"aldostools", "Bruteforce Save Data",
+									"Phoenixx1202", "Tradução PT-BR",
 									NULL };
 
-const char * menu_about_strings_project[] = { "User ID", user_id_str,
-											"Account ID", account_id_str,
-											"Console PSID", psid_str,
+const char * menu_about_strings_project[] = { "ID do Usuário", user_id_str,
+											"ID da Conta", account_id_str,
+											"PSID do Console", psid_str,
 											NULL };
 
 /***********************************************************************
@@ -83,7 +84,7 @@ static void _draw_AboutMenu(u8 alpha)
 	SetCurrentFont(font_adonais_regular);
 	SetFontColor(APP_FONT_MENU_COLOR | alpha, 0);
 	SetFontSize(APP_FONT_SIZE_JARS);
-	DrawStringMono(0, 220, "PlayStation 4 version");
+	DrawStringMono(0, 220, "Versão para PlayStation 4");
     
     for (cnt = 0; menu_about_strings[cnt] != NULL; cnt += 2)
     {
@@ -99,7 +100,7 @@ static void _draw_AboutMenu(u8 alpha)
 	SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
 	SetFontColor(APP_FONT_COLOR | alpha, 0);
 	SetFontSize(APP_FONT_SIZE_DESCRIPTION);
-	DrawString(0, 250 + ((cnt + 3) * 22), "Console details:");
+	DrawString(0, 250 + ((cnt + 3) * 22), "Detalhes do Console:");
 	SetFontSize(APP_FONT_SIZE_SELECTION);
 
 	int off = cnt + 5;
@@ -116,7 +117,7 @@ static void _draw_AboutMenu(u8 alpha)
 	SetCurrentFont(font_adonais_regular);
 	SetFontColor(APP_FONT_MENU_COLOR | alp2, 0);
 	SetFontSize(APP_FONT_SIZE_JARS);
-	DrawStringMono(0, 890, "in memory of Leon & Luna");
+	DrawStringMono(0, 890, "Em memória de Leon & Luna");
 	SetFontAlign(FONT_ALIGN_LEFT);
 }
 
@@ -126,7 +127,7 @@ static void _draw_LeonLuna(void)
 	DrawTexture(&menu_textures[help_png_index], 0, 840, 0, SCREEN_WIDTH + 20, 100, 0xFFFFFF00 | 0xFF);
 
 	SetFontColor(APP_FONT_MENU_COLOR | 0xFF, 0);
-	draw_sinetext(860, "... in memory of Leon & Luna - may your days be filled with eternal joy ...");
+	draw_sinetext(860, "... Em memória de Leon & Luna - Que seus dias sejam preenchidos com alegria eterna ...");
 }
 
 void Draw_AboutMenu_Ani(void)
@@ -138,7 +139,7 @@ void Draw_AboutMenu_Ani(void)
 		SDL_RenderClear(renderer);
 		DrawBackground2D(0xFFFFFFFF);
 
-		DrawHeader_Ani(cat_about_png_index, "About", "v" APOLLO_VERSION, APP_FONT_TITLE_COLOR, 0xffffffff, ani, 12);
+		DrawHeader_Ani(cat_about_png_index, "Sobre", "v" APOLLO_VERSION, APP_FONT_TITLE_COLOR, 0xffffffff, ani, 12);
 
 		//------------- About Menu Contents
 
@@ -162,6 +163,6 @@ void Draw_AboutMenu(int ll)
 		return(_draw_LeonLuna());
 
 	_setIdValues();
-	DrawHeader(cat_about_png_index, 0, "About", "v" APOLLO_VERSION, APP_FONT_TITLE_COLOR | 0xFF, 0xffffffff, 0);
+	DrawHeader(cat_about_png_index, 0, "Sobre", "v" APOLLO_VERSION, APP_FONT_TITLE_COLOR | 0xFF, 0xffffffff, 0);
 	_draw_AboutMenu(0xFF);
 }

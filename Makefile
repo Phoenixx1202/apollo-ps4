@@ -1,5 +1,5 @@
 # Package metadata.
-TITLE       := Apollo Save Tool
+TITLE       := Apollo Save Tool PT-BR
 VERSION     := 02.20
 TITLE_ID    := APOL00004
 CONTENT_ID  := IV0000-APOL00004_00-APOLLO0000000PS4

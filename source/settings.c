@@ -14,9 +14,9 @@
 
 #define ORBIS_USER_SERVICE_USER_ID_INVALID	-1
 
-static char * db_opt[] = {"Online DB", "FTP Server", NULL};
-static char * sort_opt[] = {"Disabled", "by Name", "by Title ID", "by Type", NULL};
-static char * usb_src[] = {"USB 0", "USB 1", "USB 2", "USB 3", "USB 4", "USB 5", "USB 6", "USB 7", "Fake USB", "Auto-detect", NULL};
+static char * db_opt[] = {"DB Online", "Servidor FTP", NULL};
+static char * sort_opt[] = {"Desabilitado", "por Nome", "por ID do título", "por Tipo", NULL};
+static char * usb_src[] = {"USB 0", "USB 1", "USB 2", "USB 3", "USB 4", "USB 5", "USB 6", "USB 7", "Fake USB", "Autodetectar", NULL};
 
 static void usb_callback(int sel);
 static void log_callback(int sel);
@@ -29,67 +29,67 @@ static void server_callback(int sel);
 static void ftp_url_callback(int sel);
 
 menu_option_t menu_options[] = {
-	{ .name = "\nBackground Music", 
+	{ .name = "\nMúsica de Fundo", 
 		.options = NULL, 
 		.type = APP_OPTION_BOOL, 
 		.value = &apollo_config.music, 
 		.callback = music_callback 
 	},
-	{ .name = "Menu Animations", 
+	{ .name = "Animações do Menu", 
 		.options = NULL, 
 		.type = APP_OPTION_BOOL, 
 		.value = &apollo_config.doAni, 
 		.callback = ani_callback 
 	},
-	{ .name = "Sort Saves",
+	{ .name = "Ordenar Jogos Salvos",
 		.options = sort_opt,
 		.type = APP_OPTION_LIST,
 		.value = &apollo_config.doSort,
 		.callback = sort_callback
 	},
-	{ .name = "USB Saves Source",
+	{ .name = "Origem dos Dados Salvos do USB",
 		.options = (char**) usb_src,
 		.type = APP_OPTION_LIST,
 		.value = &apollo_config.usb_dev,
 		.callback = usb_callback
 	},
-	{ .name = "Version Update Check", 
+	{ .name = "Verificação de Novas Versões", 
 		.options = NULL, 
 		.type = APP_OPTION_BOOL, 
 		.value = &apollo_config.update, 
 		.callback = update_callback 
 	},
-	{ .name = "\nSet User FTP Server URL",
+	{ .name = "\nConfigurar URL do FTP do Usuário",
 		.options = NULL,
 		.type = APP_OPTION_CALL,
 		.value = NULL,
 		.callback = ftp_url_callback
 	},
-	{ .name = "Online Saves Server",
+	{ .name = "Servidor de Saves Online",
 		.options = db_opt,
 		.type = APP_OPTION_LIST,
 		.value = &apollo_config.online_opt,
 		.callback = server_callback
 	},
-	{ .name = "Update Application Data", 
+	{ .name = "Atualizar Dados da Aplicação", 
 		.options = NULL, 
 		.type = APP_OPTION_CALL, 
 		.value = NULL, 
 		.callback = upd_appdata_callback 
 	},
-	{ .name = "Change Online Database URL",
+	{ .name = "Alterar URL do Banco de Dados Online",
 		.options = NULL,
 		.type = APP_OPTION_CALL,
 		.value = NULL,
 		.callback = db_url_callback 
 	},
-	{ .name = "\nClear Local Cache", 
+	{ .name = "\nLimpar Cache Local", 
 		.options = NULL, 
 		.type = APP_OPTION_CALL, 
 		.value = NULL, 
 		.callback = clearcache_callback 
 	},
-	{ .name = "Enable Debug Log",
+	{ .name = "Habilitar Log de Depuração",
 		.options = NULL,
 		.type = APP_OPTION_BOOL,
 		.value = &apollo_config.dbglog,
@@ -272,7 +272,7 @@ void update_callback(int sel)
 	*end = 0;
 	LOG("download URL is %s", start);
 
-	if (show_dialog(DIALOG_TYPE_YESNO, "New version available! Download update?"))
+	if (show_dialog(DIALOG_TYPE_YESNO, "Nova versão disponível! Deseja baixar a atualização?"))
 	{
 		char* pkg_path = (dir_exists("/data/pkg") == SUCCESS) ? "/data/pkg/apollo-ps4.pkg" : "/data/apollo-ps4.pkg";
 		if (http_download(start, NULL, pkg_path, 1))
@@ -293,12 +293,12 @@ static void log_callback(int sel)
 	if (!apollo_config.dbglog)
 	{
 		dbglogger_stop();
-		show_message("Debug Logging Disabled");
+		show_message("Log de Depuração Desabilitado");
 		return;
 	}
 
 	dbglogger_init_mode(FILE_LOGGER, APOLLO_PATH "apollo.log", 0);
-	show_message("Debug Logging Enabled\n\n%s", APOLLO_PATH "apollo.log");
+	show_message("Log de Depuração Habilitado\n\n%s", APOLLO_PATH "apollo.log");
 }
 
 static int updateSaveParams(const char* mountPath, const char* title, const char* subtitle, const char* details, uint32_t userParam)
@@ -334,7 +334,7 @@ int save_app_settings(app_config_t* config)
 
 	memset(&mount, 0x00, sizeof(mount));
 	memset(&mountResult, 0x00, sizeof(mountResult));
-	strlcpy(dirName.data, "Settings", sizeof(dirName.data));
+	strlcpy(dirName.data, "Configurações", sizeof(dirName.data));
 
 	mount.userId = apollo_config.user_id;
 	mount.dirName = &dirName;

@@ -21,7 +21,7 @@ int LoadMenuTexture(const char* path, int idx)
 {
 	int d;
 
-	LOG("Loading '%s'", path);
+	LOG("Carregando '%s'", path);
 	if (menu_textures[idx].texture)
 		SDL_DestroyTexture(menu_textures[idx].texture);
 
@@ -31,7 +31,7 @@ int LoadMenuTexture(const char* path, int idx)
 
 	if (!menu_textures[idx].buffer)
 	{
-		LOG("Error Loading texture (%s)!", path);
+		LOG("Erro ao carregar textura (%s)!", path);
 		return 0;
 	}
 
@@ -363,25 +363,25 @@ static void drawJars(uint8_t alpha)
 	SetCurrentFont(font_adonais_regular);
 
 	//Trophies
-	drawJar(jar_trophy_png_index, jar_empty_png_x, jar_empty_png_y, (alpha == 0xFF ? "Trophies" : ""), alpha);
+	drawJar(jar_trophy_png_index, jar_empty_png_x, jar_empty_png_y, (alpha == 0xFF ? "Troféus" : ""), alpha);
 
 	//USB save
-	drawJar(jar_usb_png_index, jar_usb_png_x, jar_usb_png_y, (alpha == 0xFF ? "USB Saves" : ""), alpha);
+	drawJar(jar_usb_png_index, jar_usb_png_x, jar_usb_png_y, (alpha == 0xFF ? "Saves USB" : ""), alpha);
 	
 	//HDD save
-	drawJar(jar_hdd_png_index, jar_hdd_png_x, jar_hdd_png_y, (alpha == 0xFF ? "HDD Saves" : ""), alpha);
+	drawJar(jar_hdd_png_index, jar_hdd_png_x, jar_hdd_png_y, (alpha == 0xFF ? "Saves HDD" : ""), alpha);
 
 	//Online cheats
-	drawJar(jar_db_png_index, jar_db_png_x, jar_db_png_y, (alpha == 0xFF ? (apollo_config.online_opt ? "FTP Server" : "Online DB") : ""), alpha);
+	drawJar(jar_db_png_index, jar_db_png_x, jar_db_png_y, (alpha == 0xFF ? (apollo_config.online_opt ? "FTP Server" : "DB Online") : ""), alpha);
 	
 	//User Backup
 	drawJar(jar_bup_png_index, jar_bup_png_x, jar_bup_png_y, (alpha == 0xFF ? "User Tools" : ""), alpha);
 
 	//Options
-	drawJar(jar_opt_png_index, jar_opt_png_x, jar_opt_png_y, (alpha == 0xFF ? "Settings" : ""), alpha);
+	drawJar(jar_opt_png_index, jar_opt_png_x, jar_opt_png_y, (alpha == 0xFF ? "Configurações" : ""), alpha);
 	
 	//About
-	drawJar(jar_about_png_index, jar_about_png_x, jar_about_png_y, (alpha == 0xFF ? "About" : ""), alpha);
+	drawJar(jar_about_png_index, jar_about_png_x, jar_about_png_y, (alpha == 0xFF ? "Sobre" : ""), alpha);
 
 	SetFontAlign(FONT_ALIGN_LEFT);
 }

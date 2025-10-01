@@ -80,7 +80,7 @@ uint32_t* free_mem;                         // Pointer after last texture
 */
 save_list_t hdd_saves = {
     .id = MENU_HDD_SAVES,
-    .title = "HDD Saves",
+    .title = "Dados Salvos no HDD",
     .list = NULL,
     .path = "",
     .ReadList = &ReadUserList,
@@ -93,7 +93,7 @@ save_list_t hdd_saves = {
 */
 save_list_t usb_saves = {
     .id = MENU_USB_SAVES,
-    .title = "USB Saves",
+    .title = "Dados Salvos no USB",
     .list = NULL,
     .path = "",
     .ReadList = &ReadUsbList,
@@ -119,7 +119,7 @@ save_list_t trophies = {
 */
 save_list_t online_saves = {
     .id = MENU_ONLINE_DB,
-    .title = "Online Database",
+    .title = "Base de Dados Online",
     .list = NULL,
     .path = ONLINE_URL,
     .ReadList = &ReadOnlineList,
@@ -132,7 +132,7 @@ save_list_t online_saves = {
 */
 save_list_t user_backup = {
     .id = MENU_USER_BACKUP,
-    .title = "User Tools",
+    .title = "Recursos do Usuário",
     .list = NULL,
     .path = "",
     .ReadList = &ReadBackupList,
@@ -145,7 +145,7 @@ save_list_t user_backup = {
 */
 save_list_t vmc1_saves = {
     .id = MENU_PS1VMC_SAVES,
-    .title = "PS1 Virtual Memory Card",
+    .title = "Memory Card Virtual do PS1",
     .list = NULL,
     .path = "",
     .ReadList = &ReadVmc1List,
@@ -158,7 +158,7 @@ save_list_t vmc1_saves = {
 */
 save_list_t vmc2_saves = {
     .id = MENU_PS2VMC_SAVES,
-    .title = "PS2 Virtual Memory Card",
+    .title = "Memory Card Virtual do PS2",
     .list = NULL,
     .path = "",
     .ReadList = &ReadVmc2List,
@@ -178,30 +178,30 @@ static const char* get_button_prompts(int menu_id)
 		case MENU_ONLINE_DB:
 		case MENU_PS1VMC_SAVES:
 		case MENU_PS2VMC_SAVES:
-			prompt = "\x10 Select    \x13 Back    \x12 Details    \x11 Refresh";
+			prompt = "\x10 Selecionar    \x13 Voltar    \x12 Detalhes    \x11 Atualizar";
 			break;
 
 		case MENU_USER_BACKUP:
-			prompt = "\x10 Select    \x13 Back    \x11 Refresh";
+			prompt = "\x10 Selecionar    \x13 Voltar    \x11 Atualizar";
 			break;
 
 		case MENU_SETTINGS:
 		case MENU_CODE_OPTIONS:
-			prompt = "\x10 Select    \x13 Back";
+			prompt = "\x10 Selecionar    \x13 Voltar";
 			break;
 
 		case MENU_CREDITS:
 		case MENU_PATCH_VIEW:
 		case MENU_SAVE_DETAILS:
-			prompt = "\x13 Back";
+			prompt = "\x13 Voltar";
 			break;
 
 		case MENU_PATCHES:
-			prompt = "\x10 Select    \x12 View Code    \x13 Back";
+			prompt = "\x10 Selecionar    \x12 Exibir Código    \x13 Voltar";
 			break;
 
 		case MENU_HEX_EDITOR:
-			prompt = "\x10 Value Up  \x11 Value Down   \x13 Exit";
+			prompt = "\x10 Aumentar o Valor  \x11 Reduzir o Valor   \x13 Sair";
 			break;
 
 		case MENU_MAIN_SCREEN:

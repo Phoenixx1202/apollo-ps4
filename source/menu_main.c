@@ -57,7 +57,7 @@ void initMenuOptions(void)
 
 static int ReloadUserSaves(save_list_t* save_list)
 {
-	init_loading_screen("Loading save games...");
+	init_loading_screen("Carregando jogos salvos...");
 
 	if (save_list->list)
 	{
@@ -80,7 +80,7 @@ static int ReloadUserSaves(save_list_t* save_list)
 
 	if (!save_list->list)
 	{
-		show_message("No save-games found");
+		show_message("Nenhum jogo salvo encontrado");
 		return 0;
 	}
 
@@ -105,7 +105,7 @@ static code_entry_t* LoadSaveDetails(const save_entry_t* save)
 	centry->name = strdup(save->title_id);
 
 	if (!get_save_details(save, &centry->codes))
-		asprintf(&centry->codes, "Error getting details (%s)", save->name);
+		asprintf(&centry->codes, "Erro ao obter detalhes (%s)", save->name);
 
 	LOG("%s", centry->codes);
 	return (centry);
@@ -132,7 +132,7 @@ static void SetMenu(int id)
 		case MENU_PS2VMC_SAVES:
 			if (id == MENU_MAIN_SCREEN)
 			{
-				init_loading_screen("Saving PS2 Memory Card...");
+				init_loading_screen("Salvando Memory Card do PS2...");
 				UnloadGameList(vmc2_saves.list);
 				vmc2_saves.list = NULL;
 				mcio_vmcFinish();
@@ -335,7 +335,7 @@ static void SetMenu(int id)
 		case MENU_PATCH_VIEW: //Cheat View Menu
 			menu_old_sel[MENU_PATCH_VIEW] = 0;
 			if (apollo_config.doAni)
-				Draw_CheatsMenu_View_Ani("Patch view");
+				Draw_CheatsMenu_View_Ani("Visualizar Correção");
 			break;
 
 		case MENU_SAVE_DETAILS: //Save Detail View Menu
@@ -462,7 +462,7 @@ static void doSaveMenu(save_list_t * save_list)
 
 		if (!selected_entry->codes && !save_list->ReadCodes(selected_entry))
 		{
-			show_message("No data found in folder:\n%s", selected_entry->path);
+			show_message("Os dados não foram encontrados no diretório:\n%s", selected_entry->path);
 			return;
 		}
 
@@ -514,7 +514,7 @@ static void doMainMenu(void)
 		return;
 	}
 
-	else if(orbisPadGetButtonPressed(ORBIS_PAD_BUTTON_CIRCLE) && show_dialog(DIALOG_TYPE_YESNO, "Exit to XMB?"))
+	else if(orbisPadGetButtonPressed(ORBIS_PAD_BUTTON_CIRCLE) && show_dialog(DIALOG_TYPE_YESNO, "Voltar ao Menu Principal?"))
 		close_app = 1;
 	
 	Draw_MainMenu();
@@ -654,7 +654,7 @@ static void doHexEditor(void)
 
 	else if (orbisPadGetButtonPressed(ORBIS_PAD_BUTTON_CIRCLE))
 	{
-		if (show_dialog(DIALOG_TYPE_YESNO, "Save changes to %s?", strrchr(hex_data.filepath, '/') + 1) &&
+		if (show_dialog(DIALOG_TYPE_YESNO, "Salvar alterações em %s?", strrchr(hex_data.filepath, '/') + 1) &&
 			(write_buffer(hex_data.filepath, hex_data.data, hex_data.size) == SUCCESS))
 		{
 			option_value_t* optval = list_get_item(selected_centry->options[option_index].opts, menu_sel);
@@ -713,7 +713,7 @@ static void doPatchViewMenu(void)
 		return;
 	}
 	
-	Draw_CheatsMenu_View("Patch view");
+	Draw_CheatsMenu_View("Visualizar Correção");
 }
 
 static void doCodeOptionsMenu(void)
@@ -750,7 +750,7 @@ static void doCodeOptionsMenu(void)
 				snprintf(hex_data.filepath, sizeof(hex_data.filepath), APOLLO_USER_PATH "%s_%s/%s", apollo_config.user_id, selected_entry->title_id, selected_entry->dir_name, optval->name);
 				if (read_buffer(hex_data.filepath, &hex_data.data, &hex_data.size) < 0)
 				{
-					show_message("Unable to load\n%s", hex_data.filepath);
+					show_message("Não foi possível carregar\n%s", hex_data.filepath);
 					SetMenu(last_menu_id[MENU_CODE_OPTIONS]);
 					return;
 				}
