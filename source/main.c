@@ -106,7 +106,7 @@ save_list_t usb_saves = {
 */
 save_list_t trophies = {
     .id = MENU_TROPHIES,
-    .title = "Trophies",
+    .title = "Troféus",
     .list = NULL,
     .path = "",
     .ReadList = &ReadTrophyList,
