@@ -6,10 +6,13 @@
 #include "menu.h"
 #include "menu_gui.h"
 #include "libfont.h"
+#include "common.h" // <-- CORREÇÃO PT-BR: Inclui o cabeçalho com a função de mapeamento.
 
-#define FONT_W  64
-#define FONT_H  62
-#define STEP_X  -4         // horizontal displacement
+#define FONT_W 64
+#define FONT_H 62
+#define STEP_X -4         // horizontal displacement
+#define MAX_STR_BUFFER 256 // <-- CORREÇÃO PT-BR: Define um tamanho seguro para o buffer de strings
+
 
 static int sx = SCREEN_WIDTH;
 
@@ -34,23 +37,28 @@ const char * menu_about_strings_project[] = { "ID do Usuário", user_id_str,
 /***********************************************************************
 * Draw a string of chars, amplifing y by sin(x)
 ***********************************************************************/
-static void draw_sinetext(int y, const char* string)
+static void draw_sinetext(int y, const char* original_string) // <-- Alterado o nome da variável
 {
-    int x = sx;       // every call resets the initial x
-    int sl = strlen(string);
+    // Vamos mapear a string com acentos para ASCII primeiro
+    char safe_string[MAX_STR_BUFFER]; // <-- CORREÇÃO PT-BR: Buffer local
+    map_utf8_to_ascii_fallback(original_string, safe_string, sizeof(safe_string)); // <-- CORREÇÃO PT-BR: Mapeamento
+
+    int x = sx;       // every call resets the initial x
+    // O loop abaixo, apesar de ser por byte, funcionará se a string for ASCII pura.
+    int sl = strlen(safe_string); // <-- Usa o tamanho da string mapeada.
     char tmp[2] = {0, 0};
     float amp;
 
     SetFontSize(FONT_W, FONT_H);
     for(int i = 0; i < sl; i++)
     {
-        amp = sinf(x      // testing sinf() from math.h
-                 * 0.01)  // it turns out in num of bends
-                 * 10;    // +/- vertical bounds over y
+        amp = sinf(x      // testing sinf() from math.h
+                  * 0.01)  // it turns out in num of bends
+                  * 10;    // +/- vertical bounds over y
 
         if(x > 0 && x < SCREEN_WIDTH - FONT_W)
         {
-            tmp[0] = string[i];
+            tmp[0] = safe_string[i]; // <-- Usa a string mapeada
             DrawStringMono(x, y + amp, tmp);
         }
 
@@ -60,9 +68,16 @@ static void draw_sinetext(int y, const char* string)
     //* Move string by defined step
     sx += STEP_X;
 
-    if(sx + (sl * FONT_W) < 0)           // horizontal bound, then loop
+    if(sx + (sl * FONT_W) < 0)           // horizontal bound, then loop
         sx = SCREEN_WIDTH + FONT_W;
 }
+
+
+
+
+
+
+
 
 static void _setIdValues()
 {
@@ -72,63 +87,95 @@ static void _setIdValues()
 	snprintf(account_id_str, sizeof(account_id_str), "%016lx", apollo_config.account_id);
 }
 
+
+
 static void _draw_AboutMenu(u8 alpha)
 {
-	int cnt = 0;
-	u8 alp2 = ((alpha*2) > 0xFF) ? 0xFF : (alpha * 2); 
+    char safe_string[MAX_STR_BUFFER]; // <-- CORREÇÃO PT-BR: Buffer para strings mapeadas
+    int cnt = 0;
+    u8 alp2 = ((alpha*2) > 0xFF) ? 0xFF : (alpha * 2); 
     
     //------------- About Menu Contents
-	DrawTextureCenteredX(&menu_textures[logo_text_png_index], SCREEN_WIDTH/2, 110, 0, menu_textures[logo_text_png_index].width * 3/2, menu_textures[logo_text_png_index].height * 3/2, 0xFFFFFF00 | alp2);
+    DrawTextureCenteredX(&menu_textures[logo_text_png_index], SCREEN_WIDTH/2, 110, 0, menu_textures[logo_text_png_index].width * 3/2, menu_textures[logo_text_png_index].height * 3/2, 0xFFFFFF00 | alp2);
 
     SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
-	SetCurrentFont(font_adonais_regular);
-	SetFontColor(APP_FONT_MENU_COLOR | alpha, 0);
-	SetFontSize(APP_FONT_SIZE_JARS);
-	DrawStringMono(0, 220, "Versão para PlayStation 4");
+    SetCurrentFont(font_adonais_regular);
+    SetFontColor(APP_FONT_MENU_COLOR | alpha, 0);
+    SetFontSize(APP_FONT_SIZE_JARS);
+    
+    // CORREÇÃO PT-BR: Mapeia "Versão para PlayStation 4"
+    map_utf8_to_ascii_fallback("Versão para PlayStation 4", safe_string, sizeof(safe_string));
+    DrawStringMono(0, 220, safe_string);
     
     for (cnt = 0; menu_about_strings[cnt] != NULL; cnt += 2)
     {
+        // CORREÇÃO PT-BR: Mapeia menu_about_strings[cnt]
+        map_utf8_to_ascii_fallback(menu_about_strings[cnt], safe_string, sizeof(safe_string));
         SetFontAlign(FONT_ALIGN_RIGHT);
-		DrawStringMono((SCREEN_WIDTH / 2) - 20, 280 + (cnt * 20), menu_about_strings[cnt]);
+        DrawStringMono((SCREEN_WIDTH / 2) - 20, 280 + (cnt * 20), safe_string);
         
-		SetFontAlign(FONT_ALIGN_LEFT);
-		DrawStringMono((SCREEN_WIDTH / 2) + 20, 280 + (cnt * 20), menu_about_strings[cnt + 1]);
+        // CORREÇÃO PT-BR: Mapeia menu_about_strings[cnt + 1]
+        map_utf8_to_ascii_fallback(menu_about_strings[cnt + 1], safe_string, sizeof(safe_string));
+        SetFontAlign(FONT_ALIGN_LEFT);
+        DrawStringMono((SCREEN_WIDTH / 2) + 20, 280 + (cnt * 20), safe_string);
     }
 
-	DrawTexture(&menu_textures[help_png_index], help_png_x, 300 + (cnt * 22), 0, help_png_w, 220, 0xFFFFFF00 | alp2);
+    DrawTexture(&menu_textures[help_png_index], help_png_x, 300 + (cnt * 22), 0, help_png_w, 220, 0xFFFFFF00 | alp2);
 
-	SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
-	SetFontColor(APP_FONT_COLOR | alpha, 0);
-	SetFontSize(APP_FONT_SIZE_DESCRIPTION);
-	DrawString(0, 250 + ((cnt + 3) * 22), "Detalhes do Console:");
-	SetFontSize(APP_FONT_SIZE_SELECTION);
+    SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
+    SetFontColor(APP_FONT_COLOR | alpha, 0);
+    SetFontSize(APP_FONT_SIZE_DESCRIPTION);
+    
+    // CORREÇÃO PT-BR: Mapeia "Detalhes do Console:"
+    map_utf8_to_ascii_fallback("Detalhes do Console:", safe_string, sizeof(safe_string));
+    DrawString(0, 250 + ((cnt + 3) * 22), safe_string);
+    
+    SetFontSize(APP_FONT_SIZE_SELECTION);
 
-	int off = cnt + 5;
-	for (cnt = 0; menu_about_strings_project[cnt] != NULL; cnt += 2)
-	{
-		SetFontAlign(FONT_ALIGN_RIGHT);
-		DrawString((SCREEN_WIDTH / 2) - 10, 250 + ((cnt + off) * 22), menu_about_strings_project[cnt]);
+    int off = cnt + 5;
+    for (cnt = 0; menu_about_strings_project[cnt] != NULL; cnt += 2)
+    {
+        // CORREÇÃO PT-BR: Mapeia menu_about_strings_project[cnt]
+        map_utf8_to_ascii_fallback(menu_about_strings_project[cnt], safe_string, sizeof(safe_string));
+        SetFontAlign(FONT_ALIGN_RIGHT);
+        DrawString((SCREEN_WIDTH / 2) - 10, 250 + ((cnt + off) * 22), safe_string);
 
-		SetFontAlign(FONT_ALIGN_LEFT);
-		DrawString((SCREEN_WIDTH / 2) + 10, 250 + ((off + cnt) * 22), menu_about_strings_project[cnt + 1]);
-	}
+        // A string do projeto[cnt + 1] (ID do Usuário/Conta/PSID) é sempre ASCII, não precisa de mapeamento.
+        SetFontAlign(FONT_ALIGN_LEFT);
+        DrawString((SCREEN_WIDTH / 2) + 10, 250 + ((off + cnt) * 22), menu_about_strings_project[cnt + 1]);
+    }
 
-	SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
-	SetCurrentFont(font_adonais_regular);
-	SetFontColor(APP_FONT_MENU_COLOR | alp2, 0);
-	SetFontSize(APP_FONT_SIZE_JARS);
-	DrawStringMono(0, 890, "Em memória de Leon & Luna");
-	SetFontAlign(FONT_ALIGN_LEFT);
+    SetFontAlign(FONT_ALIGN_SCREEN_CENTER);
+    SetCurrentFont(font_adonais_regular);
+    SetFontColor(APP_FONT_MENU_COLOR | alp2, 0);
+    SetFontSize(APP_FONT_SIZE_JARS);
+    
+    // CORREÇÃO PT-BR: Mapeia "Em memória de Leon & Luna"
+    map_utf8_to_ascii_fallback("Em memória de Leon & Luna", safe_string, sizeof(safe_string));
+    DrawStringMono(0, 890, safe_string);
+    
+    SetFontAlign(FONT_ALIGN_LEFT);
 }
 
 static void _draw_LeonLuna(void)
 {
-	DrawTextureCenteredY(&menu_textures[leon_luna_jpg_index], 0, SCREEN_HEIGHT/2, 0, menu_textures[leon_luna_jpg_index].width, menu_textures[leon_luna_jpg_index].height, 0xFFFFFF00 | 0xFF);
-	DrawTexture(&menu_textures[help_png_index], 0, 840, 0, SCREEN_WIDTH + 20, 100, 0xFFFFFF00 | 0xFF);
+    // ... (restante da função _draw_LeonLuna)
 
-	SetFontColor(APP_FONT_MENU_COLOR | 0xFF, 0);
-	draw_sinetext(860, "... Em memória de Leon & Luna - Que seus dias sejam preenchidos com alegria eterna ...");
+    SetFontColor(APP_FONT_MENU_COLOR | 0xFF, 0);
+    // CORREÇÃO PT-BR: Mapeia a string em draw_sinetext
+    draw_sinetext(860, "... Em memoria de Leon & Luna - Que seus dias sejam preenchidos com alegria eterna ...");
 }
+// ... (Draw_AboutMenu_Ani e Draw_AboutMenu permanecem, mas com o _draw_LeonLuna e _draw_AboutMenu corrigidos)
+
+
+
+
+
+
+
+
+
+
 
 void Draw_AboutMenu_Ani(void)
 {

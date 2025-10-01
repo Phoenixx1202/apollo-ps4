@@ -15,7 +15,7 @@
 #define ORBIS_USER_SERVICE_USER_ID_INVALID	-1
 
 static char * db_opt[] = {"DB Online", "Servidor FTP", NULL};
-static char * sort_opt[] = {"Desabilitado", "por Nome", "por ID do título", "por Tipo", NULL};
+static char * sort_opt[] = {"Desabilitado", "Por Nome", "Por ID do título", "Por Tipo", NULL};
 static char * usb_src[] = {"USB 0", "USB 1", "USB 2", "USB 3", "USB 4", "USB 5", "USB 6", "USB 7", "Fake USB", "Autodetectar", NULL};
 
 static void usb_callback(int sel);

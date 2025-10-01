@@ -1,14 +1,17 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
-#define SUCCESS 	0
-#define FAILED	 	-1
+#define SUCCESS     0
+#define FAILED      -1
 
 //----------------------------------------
 //String Utils
 //----------------------------------------
 int is_char_integer(char c);
 int is_char_letter(char c);
+
+// Adicionada função de mapeamento para tratar caracteres PT-BR em fontes limitadas
+void map_utf8_to_ascii_fallback(const char *src, char *dest, size_t dest_size);
 
 //----------------------------------------
 //FILE UTILS
