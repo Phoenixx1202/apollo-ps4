@@ -545,7 +545,7 @@ static void exportTrophiesZip(const char* exp_path)
 		return;
 	}
 
-	init_loading_screen("Exporting Trophies ...");
+	init_loading_screen("Exportando Troféus ...");
 
 	asprintf(&export_file, "%s" "trophies_%08x.zip", exp_path, apollo_config.user_id);
 	asprintf(&trp_path, TROPHY_PATH_HDD, apollo_config.user_id);

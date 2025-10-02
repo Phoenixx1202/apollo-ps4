@@ -63,7 +63,7 @@ int orbis_SaveUmount(const char* mountPath)
 	if (umountErrorCode < 0)
 	{
 		LOG("UMOUNT_ERROR (%X)", umountErrorCode);
-		notify_popup(NOTIFICATION_ICON_BAN, "Warning! Save couldn't be unmounted!");
+		notify_popup(NOTIFICATION_ICON_BAN, "Não foi possível desmontar o dado salvo!");
 	}
 
 	rmdir(mountDir);
@@ -79,7 +79,7 @@ int orbis_SaveMount(const save_entry_t *save, uint32_t mount_mode, char* mount_p
 	snprintf(mountDir, sizeof(mountDir), APOLLO_SANDBOX_PATH, save->dir_name);
 	if (mkdirs(mountDir) < 0)
 	{
-		LOG("ERROR: can't create '%s'", mountDir);
+		LOG("ERRO: não é possível criar '%s'", mountDir);
 		return 0;
 	}
 
@@ -104,11 +104,11 @@ int orbis_SaveMount(const save_entry_t *save, uint32_t mount_mode, char* mount_p
 		sqlite3 *db;
 		char *query, dbpath[256];
 
-		LOG("Creating save '%s'...", keyPath);
+		LOG("Criando salvamento '%s'...", keyPath);
 		mkdirs(volumePath);
 		if (createSave(volumePath, keyPath, save->blocks) < 0)
 		{
-			LOG("ERROR: can't create '%s'", keyPath);
+			LOG("ERRO: não é possível criar '%s'", keyPath);
 			return 0;
 		}
 
@@ -122,7 +122,7 @@ int orbis_SaveMount(const save_entry_t *save, uint32_t mount_mode, char* mount_p
 
 		if (sqlite3_exec(db, query, NULL, NULL, NULL) != SQLITE_OK)
 		{
-			LOG("Error inserting '%s': %s", save->title_id, sqlite3_errmsg(db));
+			LOG("Erro ao inserir '%s': %s", save->title_id, sqlite3_errmsg(db));
 			sqlite3_free(query);
 			sqlite3_close(db);
 			return 0;
@@ -136,12 +136,12 @@ int orbis_SaveMount(const save_entry_t *save, uint32_t mount_mode, char* mount_p
 	int mountErrorCode = mountSave(volumePath, keyPath, mountDir);
 	if (mountErrorCode < 0)
 	{
-		LOG("ERROR (%X): can't mount '%s/%s'", mountErrorCode, save->title_id, save->dir_name);
+		LOG("ERRO (%X): não consegue montar '%s/%s'", mountErrorCode, save->title_id, save->dir_name);
 		rmdir(mountDir);
 		return 0;
 	}
 
-	LOG("'%s/%s' mountPath (%s)", save->title_id, save->dir_name, mountDir);
+	LOG("'%s/%s' Local de Montagem (%s)", save->title_id, save->dir_name, mountDir);
 	strlcpy(mount_path, save->dir_name, ORBIS_SAVE_DATA_DIRNAME_DATA_MAXSIZE);
 
 	return 1;
@@ -157,14 +157,14 @@ int orbis_UpdateSaveParams(const save_entry_t* save, const char* title, const ch
 	if (!db)
 		return 0;
 
-	LOG("Updating %s ...", save->title_id);
+	LOG("Atualizando %s ...", save->title_id);
 	query = sqlite3_mprintf("UPDATE savedata SET (main_title, sub_title, detail, user_param)="
 		"(%Q, %Q, %Q, %ld) WHERE (title_id=%Q AND dir_name=%Q);",
 		title, subtitle, details, userParam, save->title_id, save->dir_name);
 
 	if (sqlite3_exec(db, query, NULL, NULL, NULL) != SQLITE_OK)
 	{
-		LOG("Failed to execute query: %s", sqlite3_errmsg(db));
+		LOG("Falha ao executar consulta: %s", sqlite3_errmsg(db));
 		sqlite3_free(query);
 		sqlite3_close(db);
 		return 0;
@@ -297,7 +297,7 @@ static void _walk_dir_list(const char* startdir, const char* inputdir, const cha
 	DIR *dp = opendir(inputdir);
 
 	if (!dp) {
-		LOG("Failed to open input directory: '%s'", inputdir);
+		LOG("Falha ao abrir o diretório de entrada: '%s'", inputdir);
 		return;
 	}
 
@@ -333,7 +333,7 @@ static option_entry_t* _getFileOptions(const char* save_path, const char* mask, 
 	if (dir_exists(save_path) != SUCCESS)
 		return NULL;
 
-	LOG("Loading filenames {%s} from '%s'...", mask, save_path);
+	LOG("Carregando nomes de arquivo {%s} de '%s'...", mask, save_path);
 
 	file_list = list_alloc();
 	_walk_dir_list(save_path, save_path, mask, file_list);
@@ -348,7 +348,7 @@ static option_entry_t* _getFileOptions(const char* save_path, const char* mask, 
 
 	for (node = list_head(file_list); (filename = list_get(node)); node = list_next(node))
 	{
-		LOG("Adding '%s' (%s)", filename, mask);
+		LOG("Incluindo '%s' (%s)", filename, mask);
 		optval = malloc(sizeof(option_value_t));
 		optval->name = filename;
 
@@ -370,55 +370,55 @@ static void _addBackupCommands(save_entry_t* item)
 	code_entry_t* cmd;
 	option_value_t* optval;
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Apply Changes & Resign", CMD_RESIGN_SAVE);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Aplicar Alterações e Reiniciar", CMD_RESIGN_SAVE);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " View Save Details", CMD_VIEW_DETAILS);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " Ver Detalhes do Jogo Salvo", CMD_VIEW_DETAILS);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_WARN " Delete Save Game", CMD_DELETE_SAVE);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_WARN " Deletar Jogo Salvo", CMD_DELETE_SAVE);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " File Backup " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " Backup de Arquivos " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);
 	list_append(item->codes, cmd);
 
 	if (item->flags & SAVE_FLAG_HDD)
 	{
-		cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy save game to USB", CMD_CODE_NULL);
-		_createOptions(cmd, "Copy Save to USB", CMD_COPY_SAVE_USB);
+		cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar jogo salvo para USB", CMD_CODE_NULL);
+		_createOptions(cmd, "Copiar Jogo Salvo para USB", CMD_COPY_SAVE_USB);
 		list_append(item->codes, cmd);
 
 		if (apollo_config.ftp_url[0])
 		{
-			cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Upload save backup to FTP", CMD_UPLOAD_SAVE);
+			cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Enviar backup do jogo salvo para FTP", CMD_UPLOAD_SAVE);
 			list_append(item->codes, cmd);
 		}
 	}
 	else
 	{
-		cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy save game to HDD", (item->flags & SAVE_FLAG_LOCKED) ? CMD_COPY_PFS : CMD_COPY_SAVE_HDD);
+		cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar jogo salvo para HDD", (item->flags & SAVE_FLAG_LOCKED) ? CMD_COPY_PFS : CMD_COPY_SAVE_HDD);
 		list_append(item->codes, cmd);
 	}
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_ZIP " Export save game to Zip", CMD_CODE_NULL);
-	_createOptions(cmd, "Export Zip to USB", CMD_EXPORT_ZIP_USB);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_ZIP " Exportar jogo salvo para Zip", CMD_CODE_NULL);
+	_createOptions(cmd, "Exportar Zip para USB", CMD_EXPORT_ZIP_USB);
 	optval = malloc(sizeof(option_value_t));
-	asprintf(&optval->name, "Export Zip to HDD");
+	asprintf(&optval->name, "Exportar Zip para HDD");
 	asprintf(&optval->value, "%c", CMD_EXPORT_ZIP_HDD);
 	list_append(cmd->options[0].opts, optval);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Export decrypted save files", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Exportar Saves Descriptografados", CMD_CODE_NULL);
 	cmd->options_count = 1;
 	cmd->options = _getFileOptions(item->path, "*", CMD_DECRYPT_FILE);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Import decrypted save files", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Importar Saves Descriptografados", CMD_CODE_NULL);
 	cmd->options_count = 1;
 	cmd->options = _getFileOptions(item->path, "*", CMD_IMPORT_DATA_FILE);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Hex Edit save game files", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Editar Saves em Hex", CMD_CODE_NULL);
 	cmd->options_count = 1;
 	cmd->options = _getFileOptions(item->path, "*", CMD_HEX_EDIT_FILE);
 	list_append(item->codes, cmd);
@@ -465,16 +465,16 @@ static void _addSfoCommands(save_entry_t* save)
 {
 	code_entry_t* cmd;
 
-	cmd = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " Keystone Backup " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " Backup Keystone " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);
 	list_append(save->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Export Keystone", CMD_EXP_KEYSTONE);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Exportar Chave Keystone", CMD_EXP_KEYSTONE);
 	list_append(save->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Import Keystone", CMD_IMP_KEYSTONE);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Importar Chave Keystone", CMD_IMP_KEYSTONE);
 	list_append(save->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Show Keystone Fingerprint", CMD_EXP_FINGERPRINT);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Mostrar Fingerprint do Keystone", CMD_EXP_FINGERPRINT);
 	list_append(save->codes, cmd);
 
 	return;
@@ -514,12 +514,12 @@ static int set_pfs_codes(save_entry_t* item)
 	code_entry_t* cmd;
 	item->codes = list_alloc();
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " View Save Details", CMD_VIEW_DETAILS);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " Detalhes do Save", CMD_VIEW_DETAILS);
 	list_append(item->codes, cmd);
 
 	snprintf(savePath, sizeof(savePath), "%s%s.bin", item->path, item->dir_name);
 	read_file(savePath, data, sizeof(data));
-	snprintf(savePath, sizeof(savePath), CHAR_ICON_WARN " --- Encrypted save requires firmware %s --- " CHAR_ICON_WARN, get_fw_by_pfskey_ver(data[8]));
+	snprintf(savePath, sizeof(savePath), CHAR_ICON_WARN " --- Jogo salvo criptografado requer firmware %s --- " CHAR_ICON_WARN, get_fw_by_pfskey_ver(data[8]));
 
 	cmd = _createCmdCode(PATCH_NULL, savePath, CMD_CODE_NULL);
 	list_append(item->codes, cmd);
@@ -560,7 +560,7 @@ int ReadCodes(save_entry_t * save)
 	{
 		if (!orbis_SaveMount(save, (save->flags & SAVE_FLAG_LOCKED), mount))
 		{
-			code = _createCmdCode(PATCH_NULL, CHAR_ICON_WARN " --- Error Mounting Save! --- " CHAR_ICON_WARN, CMD_CODE_NULL);
+			code = _createCmdCode(PATCH_NULL, CHAR_ICON_WARN " --- Erro ao Montar Save! --- " CHAR_ICON_WARN, CMD_CODE_NULL);
 			list_append(save->codes, code);
 			return list_count(save->codes);
 		}
@@ -575,14 +575,14 @@ int ReadCodes(save_entry_t * save)
 	if ((buffer = readTextFile(filePath, NULL)) == NULL)
 		goto skip_end;
 
-	code = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " Cheats " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);	
+	code = _createCmdCode(PATCH_NULL, "----- " UTF8_CHAR_STAR " Trapaças " UTF8_CHAR_STAR " -----", CMD_CODE_NULL);	
 	list_append(save->codes, code);
 
-	code = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " View Raw Patch File", CMD_VIEW_RAW_PATCH);
+	code = _createCmdCode(PATCH_COMMAND, CHAR_ICON_USER " Visualizar Arquivo de Patch Bruto", CMD_VIEW_RAW_PATCH);
 	list_append(save->codes, code);
 
 	node = list_tail(save->codes);
-	LOG("Loading BSD codes '%s'...", filePath);
+	LOG("Carregando códigos BSD '%s'...", filePath);
 	load_patch_code_list(buffer, save->codes, &get_file_entries, save->path);
 	free (buffer);
 
@@ -594,13 +594,13 @@ int ReadCodes(save_entry_t * save)
 			strchr(buffer, '\\')[0] = 0;
 			if(!wildcard_match_icase(save->dir_name, buffer))
 			{
-				LOG("(%s) Disabled code '%s'", buffer, code->name);
+				LOG("(%s) Código desabilitado '%s'", buffer, code->name);
 				code->flags |= (APOLLO_CODE_FLAG_ALERT | APOLLO_CODE_FLAG_DISABLED);
 			}
 			free(buffer);
 		}
 
-	LOG("Loaded %zu codes", list_count(save->codes));
+	LOG("carregados %zu códigos", list_count(save->codes));
 
 skip_end:
 	if (tmp)
@@ -1094,30 +1094,30 @@ list_t * ReadBackupList(const char* userPath)
 	code_entry_t * cmd;
 	list_t *list = list_alloc();
 
-	item = _createSaveEntry(SAVE_FLAG_ZIP, CHAR_ICON_ZIP " Extract Archives (RAR, Zip, 7z)");
+	item = _createSaveEntry(SAVE_FLAG_ZIP, CHAR_ICON_ZIP " Extrair Arquivos (RAR, Zip, 7z)");
 	item->path = strdup("/data/");
 	item->type = FILE_TYPE_ZIP;
 	list_append(list, item);
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_USER " Activate PS4 Accounts");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_USER " Ativar Contas do PS4");
 	asprintf(&item->path, "%s%s", APOLLO_PATH, OWNER_XML_FILE);
 	item->type = FILE_TYPE_ACT;
 	list_append(list, item);
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_USER " App.db Database Management");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_USER " Gestão do Banco de Dados App.db");
 	item->path = strdup(APP_DB_PATH_HDD);
 	strrchr(item->path, '/')[1] = 0;
 	item->type = FILE_TYPE_SQL;
 	list_append(list, item);
 
-	item = _createSaveEntry(0, CHAR_ICON_NET " Network Tools (Downloader, Web Server)");
+	item = _createSaveEntry(0, CHAR_ICON_NET " Ferramentas de Rede (Downloader, Servidor Web)");
 	item->path = strdup("/data/");
 	item->type = FILE_TYPE_NET;
 	list_append(list, item);
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_LOCK " Show Parental Security Passcode");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_LOCK " Exibir Código de Segurança Parental");
 	item->codes = list_alloc();
-	cmd = _createCmdCode(PATCH_NULL, CHAR_ICON_LOCK " Security Passcode: ????????", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_NULL, CHAR_ICON_LOCK " Código de Segurança: ????????", CMD_CODE_NULL);
 	regMgr_GetParentalPasscode(tmp);
 	strncpy(cmd->name + 21, tmp, 8);
 	list_append(item->codes, cmd);
@@ -1197,7 +1197,7 @@ int ReadBackupCodes(save_entry_t * bup)
 				continue;
 
 			regMgr_GetAccountId(i, &account);
-			snprintf(tmp, sizeof(tmp), "%c Activate Offline Account %s (%016lx)", account ? CHAR_TAG_LOCKED : CHAR_TAG_OWNER, userName, account);
+			snprintf(tmp, sizeof(tmp), "%c Ativar Conta Offline %s (%016lx)", account ? CHAR_TAG_LOCKED : CHAR_TAG_OWNER, userName, account);
 			cmd = _createCmdCode(account ? PATCH_NULL : PATCH_COMMAND, tmp, account ? CMD_CODE_NULL : CMD_CREATE_ACT_DAT);
 			cmd->codes[1] = i;
 			list_append(bup->codes, cmd);
@@ -1740,7 +1740,7 @@ list_t * ReadUsbList(const char* userPath)
 
 	list = list_alloc();
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Bulk Save Management");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Gerenciamento de Saves em Massa");
 	item->type = FILE_TYPE_MENU;
 	item->codes = list_alloc();
 	item->path = strdup(userPath);
@@ -1748,22 +1748,22 @@ list_t * ReadUsbList(const char* userPath)
 	item->dir_name = malloc(sizeof(void**));
 	((void**)item->dir_name)[0] = list;
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Resign selected Saves", CMD_RESIGN_SAVES);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Re-assinar Saves Selecionados", CMD_RESIGN_SAVES);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Resign all decrypted Saves", CMD_RESIGN_ALL_SAVES);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_SIGN " Re-assinar todos os Saves descriptografados", CMD_RESIGN_ALL_SAVES);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy selected Saves to HDD", CMD_COPY_SAVES_HDD);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar Saves selecionados para o HDD", CMD_COPY_SAVES_HDD);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy all Saves to HDD", CMD_COPY_ALL_SAVES_HDD);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar todos os Saves para o HDD", CMD_COPY_ALL_SAVES_HDD);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Start local Web Server", CMD_SAVE_WEBSERVER);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Iniciar Servidor da Web local", CMD_SAVE_WEBSERVER);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Dump all decrypted Save Fingerprints", CMD_DUMP_FINGERPRINTS);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Exportar todas Fingerprints de Saves descriptografados", CMD_DUMP_FINGERPRINTS);
 	list_append(item->codes, cmd);
 	list_append(list, item);
 
@@ -1795,7 +1795,7 @@ list_t * ReadUserList(const char* userPath)
 
 	list = list_alloc();
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Bulk Save Management");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Gerenciamento de Saves em Massa");
 	item->type = FILE_TYPE_MENU;
 	item->codes = list_alloc();
 	item->path = strdup(userPath);
@@ -1803,18 +1803,18 @@ list_t * ReadUserList(const char* userPath)
 	item->dir_name = malloc(sizeof(void**));
 	((void**)item->dir_name)[0] = list;
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy selected Saves to USB", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar Saves selecionados para o USB", CMD_CODE_NULL);
 	_createOptions(cmd, "Copy Saves to USB", CMD_COPY_SAVES_USB);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copy all Saves to USB", CMD_CODE_NULL);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Copiar todos os Saves para o USB", CMD_CODE_NULL);
 	_createOptions(cmd, "Copy Saves to USB", CMD_COPY_ALL_SAVES_USB);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Start local Web Server", CMD_SAVE_WEBSERVER);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_NET " Iniciar Servidor Web local", CMD_SAVE_WEBSERVER);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Dump all Save Fingerprints", CMD_DUMP_FINGERPRINTS);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_LOCK " Extrair todas Fingerprints de Saves", CMD_DUMP_FINGERPRINTS);
 	list_append(item->codes, cmd);
 	list_append(list, item);
 
@@ -2177,7 +2177,7 @@ list_t * ReadTrophyList(const char* userPath)
 
 	list = list_alloc();
 
-	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Export Trophies");
+	item = _createSaveEntry(SAVE_FLAG_PS4, CHAR_ICON_COPY " Exportar Troféus");
 	item->type = FILE_TYPE_MENU;
 	item->path = strdup(userPath);
 	item->codes = list_alloc();
@@ -2185,23 +2185,23 @@ list_t * ReadTrophyList(const char* userPath)
 	item->dir_name = malloc(sizeof(void**));
 	((void**)item->dir_name)[0] = list;
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Backup selected Trophies to USB", CMD_CODE_NULL);
-	_createOptions(cmd, "Save Trophies to USB", CMD_COPY_TROPHIES_USB);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Backup dos Troféus selecionados para o USB", CMD_CODE_NULL);
+	_createOptions(cmd, "Salvar Troféus no USB", CMD_COPY_TROPHIES_USB);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Backup all Trophies to USB", CMD_CODE_NULL);
-	_createOptions(cmd, "Save Trophies to USB", CMD_COPY_ALL_TROPHIES_USB);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_COPY " Backup de todos os Troféus no USB", CMD_CODE_NULL);
+	_createOptions(cmd, "Salvar Troféus no USB", CMD_COPY_ALL_TROPHIES_USB);
 	list_append(item->codes, cmd);
 
-	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_ZIP " Export all encrypted Trophies to .Zip", CMD_CODE_NULL);
-	_createOptions(cmd, "Save .Zip to USB", CMD_ZIP_TROPHY_USB);
+	cmd = _createCmdCode(PATCH_COMMAND, CHAR_ICON_ZIP " Exportar todos os Troféus protegidos para .Zip", CMD_CODE_NULL);
+	_createOptions(cmd, "Salvar .Zip no USB", CMD_ZIP_TROPHY_USB);
 	list_append(item->codes, cmd);
 	list_append(list, item);
 
 	int rc = sqlite3_prepare_v2(db, "SELECT id, trophy_title_id, title FROM tbl_trophy_title WHERE status = 0", -1, &res, NULL);
 	if (rc != SQLITE_OK)
 	{
-		LOG("Failed to fetch data: %s", sqlite3_errmsg(db));
+		LOG("Falha ao buscar dados: %s", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		return NULL;
 	}
@@ -2233,10 +2233,10 @@ int get_save_details(const save_entry_t* save, char **details)
 
 	if(save->type == FILE_TYPE_PS1)
 	{
-		asprintf(details, "%s\n\n----- PS1 Save -----\n"
-			"Game: %s\n"
-			"Title ID: %s\n"
-			"File: %s\n",
+		asprintf(details, "%s\n\n----- Save PS1 -----\n"
+			"Jogo: %s\n"
+			"ID do Título: %s\n"
+			"Arquivo: %s\n",
 			save->path,
 			save->name,
 			save->title_id,
@@ -2246,11 +2246,11 @@ int get_save_details(const save_entry_t* save, char **details)
 
 	if(save->type == FILE_TYPE_PS2)
 	{
-		asprintf(details, "%s\n\n----- PS2 Save -----\n"
-			"Game: %s\n"
-			"Title ID: %s\n"
-			"Folder: %s\n"
-			"Icon: %s\n",
+		asprintf(details, "%s\n\n----- Save PS2 -----\n"
+			"Jogo: %s\n"
+			"ID do Título: %s\n"
+			"Pasta: %s\n"
+			"Ícone: %s\n",
 			save->path,
 			save->name,
 			save->title_id,
@@ -2262,9 +2262,9 @@ int get_save_details(const save_entry_t* save, char **details)
 	if(save->type == FILE_TYPE_VMC)
 	{
 		char *tmp = strrchr(save->path, '/');
-		asprintf(details, "%s\n\n----- Virtual Memory Card -----\n"
-			"File: %s\n"
-			"Folder: %s\n",
+		asprintf(details, "%s\n\n----- Memory Card Virtual -----\n"
+			"Arquivo: %s\n"
+			"Pasta: %s\n",
 			save->path,
 			(tmp ? tmp+1 : save->path),
 			save->dir_name);
@@ -2273,9 +2273,9 @@ int get_save_details(const save_entry_t* save, char **details)
 
 	if (save->flags & SAVE_FLAG_ONLINE)
 	{
-		asprintf(details, "%s\n----- Online Database -----\n"
-			"Game: %s\n"
-			"Title ID: %s\n",
+		asprintf(details, "%s\n----- Base de Dados Online -----\n"
+			"Jogo: %s\n"
+			"ID do Título: %s\n",
 			save->path,
 			save->name,
 			save->title_id);
@@ -2284,7 +2284,7 @@ int get_save_details(const save_entry_t* save, char **details)
 
 	if (!(save->flags & SAVE_FLAG_PS4))
 	{
-		asprintf(details, "%s\n\nTitle: %s\n", save->path, save->name);
+		asprintf(details, "%s\n\nTítulo: %s\n", save->path, save->name);
 		return 1;
 	}
 
@@ -2306,13 +2306,13 @@ int get_save_details(const save_entry_t* save, char **details)
 		}
 
 		asprintf(details, "Trophy-Set Details\n\n"
-			"Title: %s\n"
-			"Description: %s\n"
+			"Título: %s\n"
+			"Descrição: %s\n"
 			"NP Comm ID: %s\n"
-			"Progress: %d/%d - %d%%\n"
-			"%c Platinum: %d/%d\n"
-			"%c Gold: %d/%d\n"
-			"%c Silver: %d/%d\n"
+			"Progresso: %d/%d - %d%%\n"
+			"%c Platina: %d/%d\n"
+			"%c Ouro: %d/%d\n"
+			"%c Prata: %d/%d\n"
 			"%c Bronze: %d/%d\n",
 			save->name, sqlite3_column_text(res, 1), save->title_id,
 			sqlite3_column_int(res, 3), sqlite3_column_int(res, 2), sqlite3_column_int(res, 4),
@@ -2331,10 +2331,10 @@ int get_save_details(const save_entry_t* save, char **details)
 	if(save->flags & SAVE_FLAG_LOCKED)
 	{
 		asprintf(details, "%s\n\n"
-			"Title ID: %s\n"
-			"Dir Name: %s\n"
-			"Blocks: %d\n"
-			"Account ID: %.16s\n",
+			"ID do Título: %s\n"
+			"Nome da Pasta: %s\n"
+			"Blocos: %d\n"
+			"ID da Conta: %.16s\n",
 			save->path,
 			save->title_id,
 			save->dir_name,
@@ -2361,15 +2361,15 @@ int get_save_details(const save_entry_t* save, char **details)
 		}
 
 		asprintf(details, "%s\n\n"
-			"Title: %s\n"
-			"Subtitle: %s\n"
-			"Detail: %s\n"
-			"Date: %s\n"
-			"Dir Name: %s\n"
-			"Blocks: %d (%d Free)\n"
-			"Size: %d Kb\n"
-			"User ID: %08x\n"
-			"Account ID: %016llx\n",
+			"Título: %s\n"
+			"Subtítulo: %s\n"
+			"Detalhe: %s\n"
+			"Data: %s\n"
+			"Nome da Pasta: %s\n"
+			"Blocos: %d (%d Livre)\n"
+			"Tamanho: %d Kb\n"
+			"ID do Usuário: %08x\n"
+			"ID da Conta: %016llx\n",
 			save->path,
 			sqlite3_column_text(res, 6),
 			sqlite3_column_text(res, 0),
@@ -2389,11 +2389,11 @@ int get_save_details(const save_entry_t* save, char **details)
 	}
 
 	snprintf(sfoPath, sizeof(sfoPath), "%s" "sce_sys/param.sfo", save->path);
-	LOG("Save Details :: Reading %s...", sfoPath);
+	LOG("Detalhes Salvos :: Lendo %s...", sfoPath);
 
 	sfo_context_t* sfo = sfo_alloc();
 	if (sfo_read(sfo, sfoPath) < 0) {
-		LOG("Unable to read from '%s'", sfoPath);
+		LOG("Não foi possível ler de '%s'", sfoPath);
 		sfo_free(sfo);
 		return 0;
 	}
@@ -2404,13 +2404,13 @@ int get_save_details(const save_entry_t* save, char **details)
 	sfo_params_ids_t* param_ids = (sfo_params_ids_t*) sfo_get_param_value(sfo, "PARAMS");
 
 	asprintf(details, "%s\n\n"
-		"Title: %s\n"
-		"Subtitle: %s\n"
-		"Detail: %s\n"
-		"Dir Name: %s\n"
-		"Blocks: %d\n"
-		"User ID: %08x\n"
-		"Account ID: %016lx\n",
+		"Título: %s\n"
+		"Subtítulo: %s\n"
+		"Detalhe: %s\n"
+		"Nome da Pasta: %s\n"
+		"Blocos: %d\n"
+		"ID do Usuário: %08x\n"
+		"ID da Conta: %016lx\n",
 		save->path, save->name,
 		subtitle,
 		detail,
